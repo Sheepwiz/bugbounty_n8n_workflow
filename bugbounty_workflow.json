@@ -1,0 +1,2423 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398449763783020710",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398449763783020710"
+        },
+        "content": "Message received ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        -16
+      ],
+      "id": "82512e70-0183-4526-b839-c6581707c6ab",
+      "name": "Send a message",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pattern": "contain",
+        "value": "http",
+        "botMention": true
+      },
+      "type": "@jordanburke/n8n-nodes-discord.discordTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -16
+      ],
+      "id": "6976e0b9-bcbf-4585-a779-72dedfe146ad",
+      "name": "Discord Trigger",
+      "webhookId": "7988239a-789a-4199-acf4-dc1d66b20089",
+      "credentials": {
+        "discordApi": {
+          "id": "h1dzV2OD2MgNrDTA",
+          "name": "Discord App account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Listen for someone to mention the discord bot and mention a URL",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -512,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "7fe35449-fffe-4cb1-8b0d-70b509c4c29c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Tell the user that they have noticed your message",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -288,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "bff0ce7f-0b9e-4d07-a67d-12f12b4f2b3d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "start subenum.sh",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1280,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "cf9ebefe-c1f9-4aa6-885c-76d283786c7c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access the input content from the first item\nlet input = $('Discord Trigger').first().json.content;\n\n// Remove protocol (http, https)\nlet noProtocol = input.replace(/^https?:\\/\\//, '');\n\n// Remove trailing slashes\nnoProtocol = noProtocol.replace(/\\/+$/, '');\n\n// Extract just the domain (e.g., ups.com)\nlet domain = noProtocol.split('/')[0];\n\n// Convert to a sanitized version for folder names\nlet sanitized = domain.replace(/\\./g, '_').replace(/[^a-zA-Z0-9_-]/g, '_');\n\n// Return both domain and sanitized name\nreturn [\n  {\n    json: {\n      domain,\n      sanitized,\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "5745b584-734a-44ae-a12c-9a320e6d47db",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "content": "Take the URL and name a folder",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "901ebc33-b955-4dc4-b527-6213504cfc45",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "command": "=[ -d {{ $('Code').item.json.sanitized }} ] || mkdir {{ $('Code').item.json.sanitized }}",
+        "cwd": "/root/discord"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -16
+      ],
+      "id": "13edfc2c-dc08-4e70-b1ea-b2e96e847e40",
+      "name": "Execute a command2",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "create a folder if it didn't exist",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        592,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "9654a9e8-5aee-4f4c-9679-686564727607",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "command": "=cp /root/discord/subenum.sh subenum.sh ",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        864,
+        -16
+      ],
+      "id": "ef8a4bf5-67c1-484c-88c8-f0cac34ecee9",
+      "name": "Execute a command3",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "move the subenum.sh file ",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        832,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "b6f7e244-5138-4220-9013-1fe3742c187e",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398449763783020710",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398449763783020710"
+        },
+        "content": "=Created the folder /root/discord/{{ $('Code').item.json.sanitized }} and moved subenum.sh. Ready to start the subdomain enumeration.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        -16
+      ],
+      "id": "829a4004-8d54-4f71-bc92-ef9a8b5d23fa",
+      "name": "Send a message2",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=./subenum.sh {{ $('Code').item.json.domain }}",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        -16
+      ],
+      "id": "4cf6bbaf-4a34-48a0-912d-1b729904a11c",
+      "name": "Execute a command4",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "Tell the user you are starting subenum.sh",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1056,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "0b8ffe10-6030-442b-8f22-4e314a41ea4b",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "download",
+        "path": "=/root/discord/{{ $('Code').item.json.sanitized }}/httpx_results.txt",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        -16
+      ],
+      "id": "e28e69ff-e7c3-41c2-a259-ec722cdea4b2",
+      "name": "Download a file",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398670448488742973",
+          "mode": "list",
+          "cachedResultName": "output",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398670448488742973"
+        },
+        "content": "=Here is the subdomain enumeration file for {{ $('Code').item.json.domain }}.",
+        "options": {},
+        "files": {
+          "values": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        -16
+      ],
+      "id": "312abc0d-67e4-4617-9b15-c9ec5b463b71",
+      "name": "Send a message3",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "download httpx_results",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1504,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "d54f5ccf-335d-4081-9351-5797308a4a6e",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "Give the user the results",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1728,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "97d6850d-0096-4870-b208-2c699114c1f9",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398449763783020710",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398449763783020710"
+        },
+        "content": "=Hey @{{ $('Discord Trigger').item.json.userName }}, your {{ $('Discord Trigger').item.json.content }} results are ready in the output channel.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        0
+      ],
+      "id": "f9ebdfd3-c813-45fc-84b1-a957ffd6ec19",
+      "name": "Send a message4",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Tell user the subdomain enumeration is done. ",
+        "height": 144,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1968,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "7f07f5c7-d2ec-44ac-8af0-1688368aee93",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "command": "=cp /root/discord/direnum.sh direnum.sh ",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        880
+      ],
+      "id": "f750c556-e696-4d17-bbd2-4fb8b114fb22",
+      "name": "Execute a command5",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "copying over direnum.sh",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -288,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "6cd9fabd-3a42-408a-a0a4-f2d4e928947b",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "command": "=[ -d {{ $json.sanitized }} ] && cd {{ $json.sanitized }} && ([ -f httpx_results.txt ] && echo \"File exists\" || echo \"File does not exist\") || echo \"File does not exist\"\n\n",
+        "cwd": "=/root/discord"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        176,
+        0
+      ],
+      "id": "1c1b10a3-7fd5-423a-812f-7e0a743c187c",
+      "name": "Execute a command",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e248d39a-2100-4b04-a9ef-1fa4e563f454",
+              "leftValue": "={{ $json.stdout }}",
+              "rightValue": "exists",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "f36a120e-0cc5-4f10-b841-43ec664376a9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "check if subdomain enum has previously run",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "9409fc01-2bba-4493-81fa-f44091903200",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "redirect if already done",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        352,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "9eecf1ac-c6bb-45bf-a3fd-24daca9be504",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398449763783020710",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398449763783020710"
+        },
+        "message": "Looks like we have already run subdomain enumeration. Do you want to skip it and run directory enumeration?",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Yes, skip",
+            "disapproveLabel": "No, rerun"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        400
+      ],
+      "id": "5213a56b-b9e9-4369-b808-e9d11bbd6971",
+      "name": "Send message and wait for response",
+      "webhookId": "300e3e27-2a90-4b82-b961-03c5ca98f0a9",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "34601005-45f4-452e-9351-b995ed25dd24",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        400
+      ],
+      "id": "600f6b9e-1073-419e-8e21-0375222f09ef",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "content": "Ask user if they want to skip subdomain ",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -480,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "9c2bb0be-9ad8-4cef-98d0-a285efc743ae",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "redirect based on answer",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -240,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "756500a4-663d-49d1-a0ad-b435cf8bce95",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398449763783020710",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398449763783020710"
+        },
+        "content": "=Hey I'm going to start the directory enumeration now for {{ $('Discord Trigger').item.json.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        880
+      ],
+      "id": "1b28cc4b-184c-4213-afe4-f53e4922f6fd",
+      "name": "Send a message5",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Tell user starting directory enumeration",
+        "height": 144,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -512,
+        688
+      ],
+      "typeVersion": 1,
+      "id": "73b696fa-6529-4b39-aaad-5a6f7c322ae9",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "command": "ls *.txt",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        192,
+        880
+      ],
+      "id": "bc1829e7-32a5-4348-932c-f6577d2f63c0",
+      "name": "Execute a command6",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "get list of files",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "511340b8-40bc-47c4-86ef-806f7c8ed8df",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Subdomain enumeration\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -848,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "e268c89d-98dc-42d4-86df-20b5455e068e",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "## Directory enumeration\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -848,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "02e7bbde-bb89-426f-b4b5-718ee73085d3",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "command": "=sed -i 's|https\\?://||g' cleaned_urls.txt && ./direnum.sh ",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        880
+      ],
+      "id": "eba09c95-4d62-4dbc-8a19-ee2902b6f1ee",
+      "name": "Execute a command8",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "run direnum.sh",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "903fe2a4-9ba8-4d11-90cd-e8eb45aa1877",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "content": "Make this list an array",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        576,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "3ce3434a-e565-43fc-9267-eef36caac3f6",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1392,
+        896
+      ],
+      "id": "cae17a7e-f021-4536-bfc3-e9a393f5c5f6",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398670448488742973",
+          "mode": "list",
+          "cachedResultName": "output",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398670448488742973"
+        },
+        "content": "=Here is the Gobuster results for {{ $json.filename }}",
+        "options": {},
+        "files": {
+          "values": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        912
+      ],
+      "id": "a6ee09a6-9636-4845-860b-12fc6be1d28f",
+      "name": "Send a message6",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "download",
+        "path": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results/{{ $json.filename }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        912
+      ],
+      "id": "ef7dfc03-06ee-48e2-aaed-bc8f743d6b17",
+      "name": "Download a file1",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398449763783020710",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398449763783020710"
+        },
+        "message": "=Wohhh there. This is going to be {{ $('Code2').item.json.newlineCount }} seperate files. Want me to zip it up and sent one file? So Are you wanting to spam the channel?",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Yes, Zip it up",
+            "disapproveLabel": "Yolo, print it"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        896,
+        1120
+      ],
+      "id": "200f6598-b266-4cdc-979e-55f5bee434b0",
+      "name": "Send message and wait for response1",
+      "webhookId": "300e3e27-2a90-4b82-b961-03c5ca98f0a9",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6ccfd9f6-6967-4c6c-9f34-a3a0f3e2c771",
+              "leftValue": "={{ $('Code2').item.json.newlineCount }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        880
+      ],
+      "id": "ebb4f212-3a23-4aa1-9a34-05dc7dae161f",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "command": "zip gobuster_results_files.zip *.txt",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1296
+      ],
+      "id": "43a25a19-c22f-4dca-aa7d-184843cc5c8a",
+      "name": "Execute a command7",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access the input string from the first item\nconst input = $('Execute a command6').first().json.stdout;\n\n// Convert escaped \\n into actual newlines and split\nconst lines = input.replace(/\\\\n/g, '\\n').split('\\n');\n\n// Create an item for each filename with pairedItem\nreturn lines.map((line, index) => ({\n  json: {\n    filename: line.trim(),\n  },\n  pairedItem: {\n    item: 0, // All new items are linked to the first input item\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        880
+      ],
+      "id": "9ab1885f-74e4-4ae4-826a-ca197d280c2f",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.stdout;\n\n// Count real newlines (actual line breaks)\nconst newlineCount = (input.match(/\\n/g) || []).length;\n\nreturn [\n  {\n    json: {\n      newlineCount\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        880
+      ],
+      "id": "69af64b6-5a08-4dfb-941f-4f7c3c43c54b",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "34601005-45f4-452e-9351-b995ed25dd24",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        1120
+      ],
+      "id": "07d9d793-1b2d-467f-ad82-ca41d6dbc86f",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398670448488742973",
+          "mode": "list",
+          "cachedResultName": "output",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398670448488742973"
+        },
+        "content": "=Here is the zip file of all the gobuster results for {{ $('Discord Trigger').item.json.content }}. Go luck!",
+        "options": {},
+        "files": {
+          "values": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        1296
+      ],
+      "id": "5dfbeec5-04f8-4032-a457-0099b0d9e2bf",
+      "name": "Send a message7",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "download",
+        "path": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results/gobuster_results_files.zip",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        1296
+      ],
+      "id": "4fb74f08-ee99-4616-ac93-485687e1240e",
+      "name": "Download a file2",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "get count of files",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        352,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "9432ee3a-dfc4-49ba-80b7-08a8aec4fc96",
+      "name": "Sticky Note21"
+    },
+    {
+      "parameters": {
+        "content": "Ask the user to zip if over 10 files check",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        848,
+        688
+      ],
+      "typeVersion": 1,
+      "id": "00adb432-b529-4f3a-97b9-30748d06a04a",
+      "name": "Sticky Note22"
+    },
+    {
+      "parameters": {
+        "content": "loops through each file and downloads it and sends it to the discord",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "647d704d-ac6a-4868-be35-00e9ba7389b3",
+      "name": "Sticky Note23"
+    },
+    {
+      "parameters": {
+        "content": "Zip files and download it and sends it to the discord",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        1104
+      ],
+      "typeVersion": 1,
+      "id": "0f159220-0e2b-4621-8890-53a57d04a108",
+      "name": "Sticky Note24"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398449763783020710",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398449763783020710"
+        },
+        "content": "=Finished {{ $('Discord Trigger').item.json.content }}. Check the #output channel for your files. ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        1904
+      ],
+      "id": "e70fffcf-e93e-4468-8d29-d6206744da4f",
+      "name": "Send a message1",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398449763783020710",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398449763783020710"
+        },
+        "message": "Do you want screenshots of the 200 responses too? ",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Yes, sent it",
+            "disapproveLabel": "No, skip and end"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        1536
+      ],
+      "id": "a7fc4788-f1db-427e-8749-7d79fd31040b",
+      "name": "Send message and wait for response2",
+      "webhookId": "300e3e27-2a90-4b82-b961-03c5ca98f0a9",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=cp /root/discord/formatter.py formatter.py",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        1520
+      ],
+      "id": "10ac142f-8bdf-4320-9b44-df072e371c4d",
+      "name": "Execute a command9",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "command": "=python3 formatter.py",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        80,
+        1520
+      ],
+      "id": "e4a94488-a54f-4b3d-9c79-c29c4aa9ba28",
+      "name": "Execute a command10",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "command": "=/root/go/bin/gowitness file -f results.txt",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        256,
+        1520
+      ],
+      "id": "aaafe983-41cf-489b-9d37-e5dbe2e429cc",
+      "name": "Execute a command11",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "## Gowitness\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -816,
+        1520
+      ],
+      "typeVersion": 1,
+      "id": "9b3b55d2-32ff-4e11-b375-290adb5229c8",
+      "name": "Sticky Note25"
+    },
+    {
+      "parameters": {
+        "content": "Ask the user if they want to run gowitness",
+        "height": 144,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -512,
+        1312
+      ],
+      "typeVersion": 1,
+      "id": "e4cd2f61-d156-4592-aeff-38a5a33b9f8b",
+      "name": "Sticky Note26"
+    },
+    {
+      "parameters": {
+        "content": "Ask they users if they want everything zipped up",
+        "height": 144,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        1120
+      ],
+      "typeVersion": 1,
+      "id": "c05858d2-7113-4d0d-99fb-3feb305882a3",
+      "name": "Sticky Note27"
+    },
+    {
+      "parameters": {
+        "content": "Copy formatter.py",
+        "height": 144,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        1296
+      ],
+      "typeVersion": 1,
+      "id": "0e569d88-93d3-4463-bbec-f9266cb29e3d",
+      "name": "Sticky Note28"
+    },
+    {
+      "parameters": {
+        "content": "Run formatter.py",
+        "height": 144,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        64,
+        1296
+      ],
+      "typeVersion": 1,
+      "id": "2f8b6f42-1d03-42d1-98c8-bc5622ffc00f",
+      "name": "Sticky Note29"
+    },
+    {
+      "parameters": {
+        "content": "Run gowitness",
+        "height": 144,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        240,
+        1296
+      ],
+      "typeVersion": 1,
+      "id": "eacb34aa-34be-4bc2-9be5-9b3aa96311be",
+      "name": "Sticky Note30"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "34601005-45f4-452e-9351-b995ed25dd24",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        1552
+      ],
+      "id": "5f49c3f6-5700-4b02-a70f-5b76d06ea7ad",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "content": "## End\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -816,
+        1872
+      ],
+      "typeVersion": 1,
+      "id": "2d20b2d2-ec83-4646-9105-da8d487a801e",
+      "name": "Sticky Note31"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1632,
+        1728
+      ],
+      "id": "e7e57e87-33ad-4490-ad91-f823c8004a2a",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398670448488742973",
+          "mode": "list",
+          "cachedResultName": "output",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398670448488742973"
+        },
+        "content": "=Here is the screenshot of {{ $json.filename }}",
+        "options": {},
+        "files": {
+          "values": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        1744
+      ],
+      "id": "80f4db19-8faf-4e7a-b23f-d34ff7ea046d",
+      "name": "Send a message8",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "download",
+        "path": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results/screenshots/{{ $json.filename }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        1744
+      ],
+      "id": "adf7f9ae-1c9b-40eb-8428-931b7afeb80b",
+      "name": "Download a file3",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398449763783020710",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398449763783020710"
+        },
+        "message": "=Wohhh there. This is going to be {{ $('Code2').item.json.newlineCount }} seperate files. Want me to zip it up and sent one file? So Are you wanting to spam the channel?",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Yes, Zip it up",
+            "disapproveLabel": "Yolo, print it"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        1952
+      ],
+      "id": "21f6ee01-b9b9-4d73-9970-56e68bfab85d",
+      "name": "Send message and wait for response3",
+      "webhookId": "300e3e27-2a90-4b82-b961-03c5ca98f0a9",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6ccfd9f6-6967-4c6c-9f34-a3a0f3e2c771",
+              "leftValue": "={{ $('Code2').item.json.newlineCount }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        1712
+      ],
+      "id": "5ff7a33e-27ed-4470-aa9e-5c8559886bda",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "command": "zip gowitness_results_files.zip *.png",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results/screenshots"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        2128
+      ],
+      "id": "86c47558-fc7a-47a6-b8d9-f2213118cffe",
+      "name": "Execute a command12",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "34601005-45f4-452e-9351-b995ed25dd24",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        1952
+      ],
+      "id": "5b02c62a-1aaa-49be-9f3b-34bb09c7eda1",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1398449763329900645",
+          "mode": "list",
+          "cachedResultName": "BugBounty Group",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1398670448488742973",
+          "mode": "list",
+          "cachedResultName": "output",
+          "cachedResultUrl": "https://discord.com/channels/1398449763329900645/1398670448488742973"
+        },
+        "content": "=Here is the zip file of all the gobuster results for {{ $('Discord Trigger').item.json.content }}. Go luck!",
+        "options": {},
+        "files": {
+          "values": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        2128
+      ],
+      "id": "c3d5e6ce-6181-4d66-b60d-a704219af2f7",
+      "name": "Send a message9",
+      "webhookId": "5c0f46dd-7c89-448c-a2c2-d42b8e3b07c5",
+      "credentials": {
+        "discordBotApi": {
+          "id": "3Sb3HBdGTmLBTXtO",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "download",
+        "path": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results/screenshots/gowitness_results_files.zip",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        2128
+      ],
+      "id": "dc421945-ae3d-4831-b1e8-b630eafc5640",
+      "name": "Download a file4",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "Ask the user to zip if over 10 files check",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1088,
+        1520
+      ],
+      "typeVersion": 1,
+      "id": "2cbfecae-b433-443f-8a46-73392b2fd1f0",
+      "name": "Sticky Note32"
+    },
+    {
+      "parameters": {
+        "content": "loops through each file and downloads it and sends it to the discord",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1792,
+        1536
+      ],
+      "typeVersion": 1,
+      "id": "e638141f-9d01-49cc-9466-1bedce285c5f",
+      "name": "Sticky Note33"
+    },
+    {
+      "parameters": {
+        "content": "Zip files and download it and sends it to the discord",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1792,
+        1936
+      ],
+      "typeVersion": 1,
+      "id": "d25acd08-4037-409b-b790-02739877344b",
+      "name": "Sticky Note34"
+    },
+    {
+      "parameters": {
+        "content": "Ask they users if they want everything zipped up",
+        "height": 144,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        896,
+        1936
+      ],
+      "typeVersion": 1,
+      "id": "3eed0218-a721-4a7b-8f76-87aa5ea96ec4",
+      "name": "Sticky Note35"
+    },
+    {
+      "parameters": {
+        "command": "=ls *.png",
+        "cwd": "=/root/discord/{{ $('Code').item.json.sanitized }}/gobuster_results/screenshots"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1520
+      ],
+      "id": "bf3bb093-2216-4e91-8980-b3451dd1e171",
+      "name": "Execute a command13",
+      "credentials": {
+        "sshPassword": {
+          "id": "Qv7lEypxarFIkxsG",
+          "name": "SSH Password account"
+        }
+      },
+      "notes": "Directory enumeration"
+    },
+    {
+      "parameters": {
+        "content": "get list of files",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        416,
+        1296
+      ],
+      "typeVersion": 1,
+      "id": "a85a0112-4698-4de2-ba5f-17f82c99918f",
+      "name": "Sticky Note36"
+    },
+    {
+      "parameters": {
+        "content": "Make this list an array",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        768,
+        1296
+      ],
+      "typeVersion": 1,
+      "id": "f745e3e3-0e6b-453d-8b1d-1e4a1f18dd05",
+      "name": "Sticky Note37"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access the input string from the first item\nconst input = $('Execute a command6').first().json.stdout;\n\n// Convert escaped \\n into actual newlines and split\nconst lines = input.replace(/\\\\n/g, '\\n').split('\\n');\n\n// Create an item for each filename with pairedItem\nreturn lines.map((line, index) => ({\n  json: {\n    filename: line.trim(),\n  },\n  pairedItem: {\n    item: 0, // All new items are linked to the first input item\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        1520
+      ],
+      "id": "7f557476-ddf5-497d-8601-30a8e61e0682",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.stdout;\n\n// Count real newlines (actual line breaks)\nconst newlineCount = (input.match(/\\n/g) || []).length;\n\nreturn [\n  {\n    json: {\n      newlineCount\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        1520
+      ],
+      "id": "74f5ef1a-59af-403e-a158-325ab1041c0b",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "content": "get count of files",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        592,
+        1296
+      ],
+      "typeVersion": 1,
+      "id": "840a7a45-8415-4955-b1ed-681c62528db8",
+      "name": "Sticky Note38"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Discord Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Execute a command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command2": {
+      "main": [
+        [
+          {
+            "node": "Execute a command3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command3": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Execute a command4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download a file": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command4": {
+      "main": [
+        [
+          {
+            "node": "Download a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message3": {
+      "main": [
+        [
+          {
+            "node": "Send a message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message4": {
+      "main": [
+        [
+          {
+            "node": "Execute a command5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute a command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute a command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command5": {
+      "main": [
+        [
+          {
+            "node": "Execute a command8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message5": {
+      "main": [
+        [
+          {
+            "node": "Execute a command5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command8": {
+      "main": [
+        [
+          {
+            "node": "Execute a command6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command6": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message6": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download a file1": {
+      "main": [
+        [
+          {
+            "node": "Send a message6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response1": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Execute a command7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command7": {
+      "main": [
+        [
+          {
+            "node": "Download a file2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download a file2": {
+      "main": [
+        [
+          {
+            "node": "Send a message7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message7": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response2": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command9": {
+      "main": [
+        [
+          {
+            "node": "Execute a command10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command10": {
+      "main": [
+        [
+          {
+            "node": "Execute a command11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Execute a command9",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download a file3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message8": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download a file3": {
+      "main": [
+        [
+          {
+            "node": "Send a message8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response3": {
+      "main": [
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command12": {
+      "main": [
+        [
+          {
+            "node": "Download a file4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "Execute a command12",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download a file4": {
+      "main": [
+        [
+          {
+            "node": "Send a message9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command13": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command11": {
+      "main": [
+        [
+          {
+            "node": "Execute a command13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "031713d2-bce8-47b1-9657-7a8a5fc38903",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bdd00a248045573b43aa7406a88997c7c89b8b1fd708dd41d977b0f9eb8ac7cf"
+  },
+  "id": "LdtJwncVGflEQ0LK",
+  "tags": []
+}
